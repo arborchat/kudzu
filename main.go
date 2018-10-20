@@ -10,8 +10,8 @@ import (
 	"os"
 	"time"
 
+	messages "github.com/arborchat/arbor-go"
 	"github.com/gambrell/lorem"
-	messages "github.com/whereswaldon/arbor/lib/messages"
 )
 
 const replyThreshold = 0.5
@@ -39,24 +39,24 @@ func main() {
 			log.Println("unable to read message: ", err)
 			return
 		}
-		a := &messages.ArborMessage{}
+		a := &messages.ProtocolMessage{}
 		err = json.Unmarshal(data[:n], a)
 		if err != nil {
 			log.Println("unable to decode message: ", err, string(data))
 			continue
 		}
 		switch a.Type {
-		case messages.NEW_MESSAGE:
+		case messages.NewMessageType:
 			// choose whether to reply
-			if a.Message.UUID != "" && rand.Float64() < replyThreshold {
-				log.Println("Choosing to reply to ", a.Message.UUID)
-				a := &messages.ArborMessage{
-					Type: messages.NEW_MESSAGE,
-					Message: &messages.Message{
-    						Username: "kudzu",
-    						Timestamp: time.Now().Unix(),
-						Parent:  a.Message.UUID,
-						Content: fmt.Sprintf("%d", replyCounter) + lorem.Lorem(rand.Intn(128), "words", false),
+			if a.ChatMessage.UUID != "" && rand.Float64() < replyThreshold {
+				log.Println("Choosing to reply to ", a.ChatMessage.UUID)
+				a := &messages.ProtocolMessage{
+					Type: messages.NewMessageType,
+					ChatMessage: &messages.ChatMessage{
+						Username:  "kudzu",
+						Timestamp: time.Now().Unix(),
+						Parent:    a.ChatMessage.UUID,
+						Content:   fmt.Sprintf("%d", replyCounter) + lorem.Lorem(rand.Intn(128), "words", false),
 					},
 				}
 				replyCounter++
